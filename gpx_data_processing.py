@@ -1,13 +1,10 @@
+import hashlib
+
 import gpxpy
-import matplotlib.pyplot as plt
-import datetime
 from geopy import distance
-from math import sqrt, floor
-import numpy as np
+from math import sqrt
+
 import pandas as pd
-#import plotly.plotly as py
-#import plotly.graph_objs as go
-import haversine
 from gpxpy.gpx import GPXTrackPoint
 from pandas import DataFrame
 
@@ -15,6 +12,22 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_colwidth', None)
 
 path = 'resources/Rennradtour_03_04_2021_12_06.gpx'
+
+def create_md5_hash_code(path: str, chunk_size:int=1024) -> str:
+    """
+    Function which takes a file name and returns md5 checksum of the file
+    """
+    hash = hashlib.md5()
+    with open(path, "rb") as f:
+        # Read the 1st block of the file
+        chunk = f.read(chunk_size)
+        # Keep reading the file until the end and update hash
+        while chunk:
+            hash.update(chunk)
+            chunk = f.read(chunk_size)
+
+    # Return the hex checksum
+    return hash.hexdigest()
 
 def read_gpx_data(path: str) -> [GPXTrackPoint]:
     gpx_file = open(path, 'r')
@@ -89,7 +102,7 @@ def calculate_speed(df: DataFrame) -> DataFrame:
                                               df_drop_small_time_diffs['time_dif']) * 3.6
     return df_drop_small_time_diffs
 
-def filter_for_moving_times(df: DataFrame, threshold: float = 0.9)-> DataFrame:
+def filter_for_moving_times(df: DataFrame, threshold: float = 0.9) -> DataFrame:
     # choose here the best fit for vincenty or haversine 2d / 3d
     # currently chosen: vincenty 3d
     df.loc[:,'dis_dif_per_sec'] = df['dis_dif_vin_2d'] / df['time_dif']
@@ -99,20 +112,33 @@ def filter_for_moving_times(df: DataFrame, threshold: float = 0.9)-> DataFrame:
 
     return df_with_timeout
 
-gpx_data = read_gpx_data(path)
-df = create_dataframe_from_gpx_data(gpx_data)
-df_metrics = compute_tour_distances(df, gpx_data)
+def add_hash_id_to_dataframe(df: DataFrame, path: str) -> DataFrame:
+    hash_code = create_md5_hash_code(path)
+    df["hash_id"] = hash_code
+    return df
 
-df_speed = calculate_speed(df_metrics)
-df_moving_time = filter_for_moving_times(df_speed)
+def prepare_gpx_data_for_database(path:str) -> DataFrame:
 
-print(df_moving_time.head(20))
+    gpx_data = read_gpx_data(path)
+
+    df = create_dataframe_from_gpx_data(gpx_data)
+
+    df_metrics = compute_tour_distances(df, gpx_data)
+
+    df_speed = calculate_speed(df_metrics)
+
+    df_moving_time = filter_for_moving_times(df_speed)
+
+    df_hash_id = add_hash_id_to_dataframe(df_moving_time, path)
+
+    return df_hash_id
+#print(df_moving_time.head(20))
 
 #df_moving_time.hist(column='spd', bins=200)
 #plt.show()
 
 #plt.plot(df['lon'], df['lat'])
 
-plt.plot(df_moving_time['time'], df_moving_time['spd'])
+#plt.plot(df_moving_time['time'], df_moving_time['spd'])
 
-plt.show()
+#plt.show()
