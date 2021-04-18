@@ -11,7 +11,7 @@ from pandas import DataFrame
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_colwidth', None)
 
-path = 'resources/Rennradtour_03_04_2021_12_06.gpx'
+path = "data/Rennradtour_03_04_2021_12_06.gpx"
 
 def create_md5_hash_code(path: str, chunk_size:int=1024) -> str:
     """
