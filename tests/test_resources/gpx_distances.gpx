@@ -16,22 +16,6 @@
         <ele>510.000000</ele>
         <time>2021-04-18T20:00:00.000Z</time>
       </trkpt>
-      <trkpt lat="10.200000" lon="10.200000">
-        <ele>520.000000</ele>
-        <time>2021-04-18T20:10:00.000Z</time>
-      </trkpt>
-      <trkpt lat="10.300000" lon="10.300000">
-        <ele>530.000000</ele>
-        <time>2021-04-18T20:20:00.000Z</time>
-      </trkpt>
-      <trkpt lat="10.400000" lon="10.400000">
-        <ele>540.000000</ele>
-        <time>2021-04-18T20:30:00.000Z</time>
-      </trkpt>
-      <trkpt lat="10.500000" lon="10.500000">
-        <ele>550.000000</ele>
-        <time>2021-04-18T20:40:00.000Z</time>
-      </trkpt>
     </trkseg>
   </trk>
 </gpx>
