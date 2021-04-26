@@ -5,6 +5,7 @@ from geopy import distance
 from math import sqrt
 
 import pandas as pd
+import numpy as np
 from gpxpy.gpx import GPXTrackPoint
 from pandas import DataFrame
 
@@ -89,6 +90,10 @@ def compute_tour_distances(df: DataFrame, gpx_data: [GPXTrackPoint]) -> DataFram
     df['time_dif'] = time_dif
     df['dis_dif_vin_2d'] = dist_dif_vin_2d
 
+    # calculate altitude gain and loss. Sum to get total gain and loss in meters.
+    # Note: alt_dif col might be misleading as negative differences for n-1 indicate alt gain and vice verca.
+    df['alt_loss'] = np.where(df['alt_dif'] > 0, df['alt_dif'], 0)
+    df['alt_gain'] = np.where(df['alt_dif'] < 0, abs(df['alt_dif']), 0)
     #print('Vincenty 2D : ', dist_vin_no_alt[-1])
     #print('Vincenty 3D : ', dist_vin[-1])
     #print('Total Time : ', floor(sum(time_dif) / 60), ' min ', int(sum(time_dif) % 60), ' sec ')
