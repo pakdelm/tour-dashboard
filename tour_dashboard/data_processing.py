@@ -2,7 +2,7 @@ import hashlib
 
 import gpxpy
 from geopy import distance
-from math import sqrt
+from math import sqrt, floor
 
 import pandas as pd
 import numpy as np
@@ -92,13 +92,23 @@ def compute_tour_distances(df: DataFrame, gpx_data: [GPXTrackPoint]) -> DataFram
 
     # calculate altitude gain and loss. Sum to get total gain and loss in meters.
     # Note: alt_dif col might be misleading as negative differences for n-1 indicate alt gain and vice verca.
-    df['alt_loss'] = np.where(df['alt_dif'] > 0, df['alt_dif'], 0)
-    df['alt_gain'] = np.where(df['alt_dif'] < 0, abs(df['alt_dif']), 0)
+    df['alt_dif_loss'] = np.where(df['alt_dif'] > 0, df['alt_dif'], 0)
+    df['alt_dif_gain'] = np.where(df['alt_dif'] < 0, abs(df['alt_dif']), 0)
     #print('Vincenty 2D : ', dist_vin_no_alt[-1])
     #print('Vincenty 3D : ', dist_vin[-1])
     #print('Total Time : ', floor(sum(time_dif) / 60), ' min ', int(sum(time_dif) % 60), ' sec ')
 
     return df
+
+def get_distance_metrics_from_dataframe(df: DataFrame) -> DataFrame:
+
+    distance_km = round(df['dis_vin_2d'].iloc[-1] / 1000, 1)
+    time = df['time_dif']
+    time_min = floor(sum(time) / 60)
+    altitude_loss = sum(df['alt_dif_loss'])
+    altitude_gain = sum(df['alt_dif_gain'])
+
+    return distance_km, time_min, altitude_gain, altitude_loss
 
 def calculate_speed(df: DataFrame) -> DataFrame:
     # super important step to match speed distribution of app. Implement in speed function

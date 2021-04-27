@@ -49,11 +49,8 @@ def test_compute_tour_distances():
     df_input = data_processing.create_dataframe_from_gpx_data(gpx_data)
     df_distances = data_processing.compute_tour_distances(df_input, gpx_data)
 
-    distance_km = round(df_distances['dis_vin_2d'].iloc[-1] / 1000, 1)
-    time = df_distances['time_dif']
-    time_min = floor((sum(time) / 60))
-    altitude_loss = sum(df_distances['alt_loss'])
-    altitude_gain = sum(df_distances['alt_gain'])
+    distance_km, time_min, altitude_gain, altitude_loss = data_processing.\
+                                                            get_distance_metrics_from_dataframe(df_distances)
 
     assert(distance_km) == 21.4
     assert(time_min) == 69
