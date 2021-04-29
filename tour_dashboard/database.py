@@ -1,12 +1,17 @@
+from pandas import DataFrame
 from sqlalchemy import create_engine
 
-from tour_dashboard import data_processing
+from tour_dashboard import data_processing, utils
 
-# TODO: Create function to append to table
+val = 'sqlite:///data/data.db'
 
-engine = create_engine('sqlite:///data/data.db', echo=False)
+def write_df_to_database(df: DataFrame, database_path: str) -> None:
 
-df = data_processing.prepare_gpx_data_for_database(data_processing.path)
+	engine = create_engine(database_path, echo=False)
+
+	hash_id_input =
+
+	entry_already_exists = utils.value_exists_in_dataframe(df, )
 
 # TODO: Validate to write only new data and drop already existing data via hash id
 df.to_sql('tour_data', con=engine, if_exists='append')

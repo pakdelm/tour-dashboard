@@ -1,21 +1,27 @@
 from datetime import datetime
 
+import gpxpy
 from gpxpy.gpxfield import SimpleTZ
 
-from tour_dashboard import data_processing
+from tour_dashboard import data_processing, statistics
 
 import pandas as pd
 
-gpx_test_path = "../tests/test_resources/gpx_read_data.gpx"
-gpx_test_data = data_processing.read_gpx_data(gpx_test_path)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
 
-df = data_processing.create_dataframe_from_gpx_data(gpx_test_data)
+path = "../data/Rennradtour_03_04_2021_12_06.gpx"
 
-df_expected = pd.DataFrame(columns=['lon', 'lat', 'alt', 'time'])
-df_expected = df_expected.append({'lon': 10.1,
-                    'lat' : 10.1,
-                    'alt' : 510.0,
-                    'time' : datetime(2021, 4, 18, 20, 0, tzinfo=SimpleTZ("Z")).replace(tzinfo=None, microsecond=0)},
-                    ignore_index=True)
+df = data_processing.prepare_gpx_data_for_database(path)
 
-print(df_expected.head(10))
+distance_km, time_min, altitude_gain, altitude_loss = statistics.get_distance_metrics_from_dataframe(df)
+
+print(distance_km, time_min, altitude_gain, altitude_loss)
+print(df.head(50))
+print(df.hash_id.unique())
+
+df_write_id = df.hash_id.unique()
+df_table_id = ["f5612ec0c11bf663b7ad749bd2e61e83", "f5612ec0c11bf663b7ad749bd2e61e83", "99999"]
+
+check = any(item in df_write_id for item in df_table_id)
+print(check)
