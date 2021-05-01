@@ -21,3 +21,7 @@ def value_exists_in_dataframe(df: DataFrame, value:Any) -> bool:
 def entry_exists_in_table_data(df_to_write:DataFrame, df_table:DataFrame) -> bool:
     df_to_write_ids = df_to_write.hash_id.unique()
     df_table_ids = df_table.hash_id.unique()
+    return any(item in df_to_write_ids for item in df_table_ids)
+
+def file_exists(path:str) -> bool:
+    return os.path.isfile(path)

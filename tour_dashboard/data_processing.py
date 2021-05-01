@@ -2,7 +2,6 @@ import hashlib
 
 import gpxpy
 from geopy import distance
-from math import sqrt
 
 import pandas as pd
 import numpy as np
