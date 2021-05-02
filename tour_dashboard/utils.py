@@ -25,3 +25,14 @@ def entry_exists_in_table_data(df_to_write:DataFrame, df_table:DataFrame) -> boo
 
 def file_exists(path:str) -> bool:
     return os.path.isfile(path)
+
+def create_file_paths_with_extension(directory: str, extension: str) -> [str]:
+    file_paths = []
+
+    for file in os.listdir(directory):
+        if file.endswith(extension):
+            file_with_extension = os.path.join(directory, file)
+            file_path = create_os_independent_path(file_with_extension)
+            file_paths.append(file_path)
+
+    return file_paths

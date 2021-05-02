@@ -20,4 +20,17 @@ def test_entry_exists_in_table_data():
     df_table = pd.read_sql_query(query, engine)
 
     result = utils.entry_exists_in_table_data(df_to_write, df_table)
-    print(result)
+    assert result == True
+
+def test_create_file_paths_with_extension():
+    dir = "../tests/test_resources"
+    extension = ".gpx"
+    source_file_paths = utils.create_file_paths_with_extension(dir, extension)
+
+    test_files = ["tests/test_resources/gpx_distances.gpx", "tests/test_resources/gpx_read_data.gpx"]
+    path_prefix = "../"
+    expected_file_paths = [utils.create_os_independent_path(path_prefix+element) for element in test_files]
+
+    assert source_file_paths == expected_file_paths
+
+

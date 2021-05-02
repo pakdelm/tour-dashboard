@@ -1,22 +1,17 @@
 import pytest
-import pandas as pd
-from sqlalchemy import create_engine
-
 from tour_dashboard import data_processing, database
 
-path = "../data/2021-04-11_346102736_Rennradtour 11.04.2021 14 38.gpx"
-database_path = '../data/data.db'
+path = "../tests/test_resources/gpx_distances.gpx"
+database_path = '../tests/test_resources/test_data.db'
 table_name = 'tour_data'
 
 def test_write_df_to_database():
 	df_to_write = data_processing.prepare_gpx_data_for_database(path)
-	database.write_df_to_database(df_to_write, database_path, 'tour_data')
 
-	sqlite_database_path = 'sqlite:///' + database_path
-	engine = create_engine(sqlite_database_path, echo=False)
+	# repeat data writing 3 x to ensure that duplicate assertion is correct
+	for i in range(0, 3):
+		database.write_df_to_database(df_to_write, database_path, table_name)
 
-	query = f"SELECT * FROM {table_name}"
-	df_table = pd.read_sql_query(query, engine)
+	df_table = database.load_df_from_database(database_path, table_name)
 
-	print(df_table.head(50))
-	print(len(df_table.index))
+	assert len(df_to_write.index) == len(df_table.index)
