@@ -30,3 +30,10 @@ def filter_for_moving_times(df: DataFrame, threshold: float = 0.9) -> DataFrame:
     df_with_timeout = df[df['dis_dif_per_sec'] > threshold].copy()
 
     return df_with_timeout
+
+def truncate_to_date(df: DataFrame, timestamp_col: str, date_col: str) -> DataFrame:
+    df[timestamp_col] = pd.to_datetime(df[timestamp_col])
+    df[date_col] = df[timestamp_col].dt.floor('d')
+    return df
+
+#def create_df_statistics():
