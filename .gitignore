@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# database files
+*.db
+
+# PyCharm settings
+.idea/
+
+# gpx files
+*_tour.gpx
