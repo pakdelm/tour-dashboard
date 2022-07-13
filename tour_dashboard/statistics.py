@@ -1,6 +1,7 @@
 from math import floor
 
 from pandas import DataFrame
+import pandas as pd
 
 def get_distance_metrics_from_dataframe(df: DataFrame) -> (float, int, float, float):
     '''

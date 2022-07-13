@@ -1,7 +1,7 @@
-from sqlalchemy import create_engine
+from tour_dashboard import utils, data_processing, database
 import pandas as pd
 
-from tour_dashboard import utils, data_processing, database
+pd.set_option("display.max_columns", None)
 
 directory = "../data"
 gpx_extension = ".gpx"

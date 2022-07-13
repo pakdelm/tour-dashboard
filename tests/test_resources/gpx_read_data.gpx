@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<gpx version="1.1" creator="https://www.komoot.de" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<gpx version="1.1" creator="https://www.test.de" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
   <metadata>
     <name>GPX Test 18.04.2021 20:20</name>
     <author>
-      <link href="https://www.komoot.de">
-        <text>komoot</text>
+      <link href="https://www.test.de">
+        <text>test</text>
         <type>text/html</type>
       </link>
     </author>

@@ -2,18 +2,19 @@
 name = "tour-dashboard"
 version = "0.1.0"
 description = "Load, process and visualize gpx data from exercise tours."
-authors = ["Mehrshad Pakdel <mehrshad.pakdel@gmail.com>"]
+authors = ["Mehrshad Pakdel <mehrshad.pakdel@posteo.de>"]
 license = "Apache 2.0"
 
 [tool.poetry.dependencies]
-python = "3.8"
+python = "^3.8"
 pandas = "^1.2.4"
 numpy = "^1.20.2"
 SQLAlchemy = "^1.4.12"
-hashlib = "^20081119"
+hashlib = "*"
 gpxpy = "^1.4.2"
 geopy = "^2.1.0"
 pytest = "^6.2.3"
+pyOpenSSL = "^22.0.0"
 
 [tool.poetry.dev-dependencies]
 

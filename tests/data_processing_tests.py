@@ -52,7 +52,7 @@ def test_compute_tour_distances():
     distance_km, time_min, altitude_gain, altitude_loss = statistics.\
                                                             get_distance_metrics_from_dataframe(df_distances)
 
-    assert(distance_km) == 21.4
+    assert(distance_km) == 22.6
     assert(time_min) == 69
     assert(altitude_loss) == pytest.approx(40, 1)
     assert(altitude_gain) == pytest.approx(110, 5)
