@@ -15,6 +15,7 @@ gpxpy = "^1.4.2"
 geopy = "^2.1.0"
 pytest = "^6.2.3"
 pyOpenSSL = "^22.0.0"
+Mypy = "^0.960"
 
 [tool.poetry.dev-dependencies]
 
