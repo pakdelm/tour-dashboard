@@ -1,8 +1,8 @@
 import os
-from typing import Any
+import json
+from typing import Any, Dict
 
 from pandas import DataFrame
-
 
 def create_os_independent_path(path: str) -> str:
     # First normalize the path string into a proper string for the OS.
@@ -46,3 +46,11 @@ def create_file_paths_with_extension(directory: str, extension: str) -> [str]:
             file_paths.append(file_path)
 
     return file_paths
+
+# def parse_json(path:str) -> Dict[str:str]:
+#
+#     if file_exists(path):
+#         with open(path, 'r') as f:
+#             json_dict = json.load(f)
+#     else:
+#         Exception.
