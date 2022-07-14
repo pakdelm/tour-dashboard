@@ -16,6 +16,7 @@ geopy = "^2.1.0"
 pytest = "^6.2.3"
 pyOpenSSL = "^22.0.0"
 Mypy = "^0.960"
+pylint = "^2.14.4"
 
 [tool.poetry.dev-dependencies]
 
