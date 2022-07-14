@@ -46,7 +46,7 @@ def test_parse_json():
         "host": "127.0.0.1",
         "port": "3306",
         "databaseName": "your_database_name",
-        "tableName" : "your_table_name"
+        "tableName": "your_table_name"
     }
 
     assert parsed_dict == expected_dict
