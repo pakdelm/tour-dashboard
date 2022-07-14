@@ -5,10 +5,11 @@ pd.set_option("display.max_columns", None)
 
 directory = "../data"
 gpx_extension = ".gpx"
-database_path = '../data/data.db'
+database_path = '../data/data_concat.db'
 table_name = 'tour_data'
+user_name = "user1"
 
-write_to_table = False
+write_to_table = True
 print_table = True
 
 if __name__ == "__main__":
@@ -17,7 +18,10 @@ if __name__ == "__main__":
 		gpx_files = utils.create_file_paths_with_extension(directory, gpx_extension)
 
 		for file_path in gpx_files:
-			df_to_write = data_processing.prepare_gpx_data_for_database(file_path)
+			df_to_write = data_processing.prepare_gpx_data_for_database(file_path, user_name)
+
+			print(df_to_write.head(50))
+
 			database.write_df_to_database(df_to_write, database_path, table_name)
 
 	if print_table:

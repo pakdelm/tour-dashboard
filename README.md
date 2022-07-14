@@ -1,5 +1,7 @@
 # tour-dashboard
 
+Load, process and create statistics from gpx data from exercises.
+
 ## Poetry
 ### Activate Venv and Set Up in IDE
 - Get path to venv `poetry env info --path`

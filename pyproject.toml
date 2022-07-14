@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tour-dashboard"
 version = "0.1.0"
-description = "Load, process and visualize gpx data from exercise tours."
+description = "Load, process and visualize gpx data from exercises."
 authors = ["Mehrshad Pakdel <mehrshad.pakdel@posteo.de>"]
 license = "Apache 2.0"
 
