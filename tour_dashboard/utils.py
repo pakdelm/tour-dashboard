@@ -1,6 +1,7 @@
 """
 utils for path generation and assertions
 """
+import logging
 import os
 import json
 from typing import Any, Dict, List, Optional
@@ -54,9 +55,9 @@ def entry_exists_in_table_data(df_to_write: DataFrame, df_table: DataFrame) -> b
     result = any(item in df_to_write_ids for item in df_table_ids)
 
     if result:
-        print(f"Tour: {tour_name} already exists in database.")
+        logging.info(f"Tour: {tour_name} already exists in database.")
     else:
-        print(f"Tour: {tour_name} is a new entry.")
+        logging.info(f"Tour: {tour_name} is a new entry.")
 
     return result
 
