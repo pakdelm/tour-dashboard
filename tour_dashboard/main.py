@@ -1,27 +1,43 @@
+import logging
+
+import sqlalchemy
+
 from tour_dashboard import utils, data_processing, database
 import pandas as pd
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 pd.set_option("display.max_columns", None)
+
 
 directory = "../data"
 gpx_extension = ".gpx"
-database_path = '../data/data.db'
-table_name = 'tour_data'
+database_path = '../data/data_concat.db'
 
-write_to_table = False
+resources = "../resources"
+credentials_path = f"{resources}/mysql_credentials.json"
+
+table_name = 'test_table_v01'
+user_name = "user1"
+
+write_to_table = True
 print_table = True
 
 if __name__ == "__main__":
+
+	credentials = utils.parse_json(credentials_path)
+	mysql_url = database.create_mysql_url(credentials)
+	mysql_engine = sqlalchemy.create_engine(mysql_url, echo=False)
 
 	if write_to_table:
 		gpx_files = utils.create_file_paths_with_extension(directory, gpx_extension)
 
 		for file_path in gpx_files:
-			df_to_write = data_processing.prepare_gpx_data_for_database(file_path)
-			database.write_df_to_database(df_to_write, database_path, table_name)
+			df_to_write = data_processing.prepare_gpx_data_for_database(file_path, user_name)
+
+			database.write_df_to_database(df_to_write, mysql_engine, table_name)
 
 	if print_table:
-		df_table = database.load_df_from_database(database_path, table_name)
+		df_table = database.load_df_from_database(mysql_engine, table_name)
 
 		print(df_table.head(50))
 		print(len(df_table.index))

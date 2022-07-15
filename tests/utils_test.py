@@ -1,3 +1,4 @@
+import pytest
 from sqlalchemy import create_engine
 import pandas as pd
 from tour_dashboard import utils, data_processing
@@ -33,4 +34,22 @@ def test_create_file_paths_with_extension():
 
     assert source_file_paths == expected_file_paths
 
+def test_parse_json():
+    path_to_json = "../tests/test_resources/db_credentials_test.json"
+    path_to_nothing = "../tests/test_resources/no_file.json"
 
+    parsed_dict = utils.parse_json(path_to_json)
+
+    expected_dict = {
+        "userName": "your_user_name",
+        "password": "your_password",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "databaseName": "your_database_name",
+        "tableName": "your_table_name"
+    }
+
+    assert parsed_dict == expected_dict
+
+    with pytest.raises(FileNotFoundError):
+        utils.parse_json(path_to_nothing)

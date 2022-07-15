@@ -1,20 +1,25 @@
 [tool.poetry]
 name = "tour-dashboard"
 version = "0.1.0"
-description = "Load, process and visualize gpx data from exercise tours."
+description = "Load, process and visualize gpx data from exercises."
 authors = ["Mehrshad Pakdel <mehrshad.pakdel@posteo.de>"]
 license = "Apache 2.0"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-pandas = "^1.2.4"
-numpy = "^1.20.2"
-SQLAlchemy = "^1.4.12"
+python = ">=3.8,<3.11"
+pandas = "^1.4.3"
+pandas-stubs = "^1.4.3.220710"
+numpy = "^1.23.0"
+SQLAlchemy = ">=1.4.12,<2.0"
+sqlalchemy2-stubs = "^0.0.2a24"
 hashlib = "*"
 gpxpy = "^1.4.2"
 geopy = "^2.1.0"
 pytest = "^6.2.3"
 pyOpenSSL = "^22.0.0"
+Mypy = "^0.960"
+pylint = "^2.14.4"
+PyMySQL = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 
