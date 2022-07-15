@@ -33,7 +33,7 @@ def create_mysql_url(credentials: Dict[str, str]) -> str:
     return url
 
 
-def create_sqlite_engine(database_path: str) -> str:
+def create_sqlite_url(database_path: str) -> str:
     """
     Create sqlite connection url string
     :param database_path: local path to database
@@ -44,6 +44,9 @@ def create_sqlite_engine(database_path: str) -> str:
 
     return sqlite_database_path
 
+def execute_sql_query(engine: Engine, query) -> None:
+    with engine.connect() as con:
+        con.execute(query)
 
 def load_df_from_database(engine: Engine, table_name: str) -> pd.DataFrame:
     """
@@ -54,7 +57,7 @@ def load_df_from_database(engine: Engine, table_name: str) -> pd.DataFrame:
     """
     query = f"SELECT * FROM {table_name}"
     df_table = pd.read_sql_query(query, engine)
-    return df_table
+    return df_table.drop(columns=["index"])
 
 
 def table_exists(engine: Engine, table_name: str) -> bool:
@@ -66,7 +69,6 @@ def table_exists(engine: Engine, table_name: str) -> bool:
     """
 
     return sqlalchemy.inspect(engine).has_table(table_name)
-
 
 def write_df_to_database(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
     """
