@@ -1,74 +1,110 @@
+"""
+Pipeline functions to load gpx file and process data to calculate time series statistics and create
+tour meta data and return as DataFrame
+"""
+from datetime import datetime
+from typing import List
 import hashlib
-
-import gpxpy
-from geopy import distance
 
 import pandas as pd
 import numpy as np
-from gpxpy.gpx import GPXTrackPoint
-from pandas import DataFrame
-from datetime import datetime
-from typing import List, Optional
 
+import gpxpy
+import geopy  # type: ignore
+
+
+# pylint: disable=C0103
 
 def create_md5_hash_code(path: str, chunk_size: int = 1024) -> str:
     """
     Function which takes a file name and returns md5 checksum of the file
+    :param path: Path to file to create hash code
+    :param chunk_size: Chunk size of hash
+    :return: Hex checksum of file
     """
-    hash = hashlib.md5()
+    hash_code = hashlib.md5()
     with open(path, "rb") as f:
         # Read the 1st block of the file
         chunk = f.read(chunk_size)
         # Keep reading the file until the end and update hash
         while chunk:
-            hash.update(chunk)
+            hash_code.update(chunk)
             chunk = f.read(chunk_size)
 
     # Return the hex checksum
-    return hash.hexdigest()
+    return hash_code.hexdigest()
 
 
-def read_gpx_data(path: str) -> List[GPXTrackPoint]:
-    gpx_file = open(path, 'r')
-    gpx = gpxpy.parse(gpx_file)
+def read_gpx_data(path: str) -> List[gpxpy.gpx.GPXTrackPoint]:
+    """
+    Parse gpx data from file path
+    :param path: Path to gpx file
+    :return: GPXTrackPoint class containing elements of gps coordinate information
+    """
+    with open(path, 'r', encoding="utf-8") as gpx_file:
+        gpx = gpxpy.parse(gpx_file)
 
     data = gpx.tracks[0].segments[0].points
 
     return data
 
 
-def get_tour_name_from_gpx_data(path: str) -> Optional[str]:
-    gpx_file = open(path, 'r')
-    gpx = gpxpy.parse(gpx_file)
+def get_tour_name_from_gpx_data(path: str) -> str:
+    """
+    Return metadata tour name from gpx file
+    :param path: Path to gpx file
+    :return: Tour name of gpx file
+    """
+    with open(path, 'r', encoding="utf-8") as gpx_file:
+        gpx = gpxpy.parse(gpx_file)
 
     tour_name = gpx.tracks[0].name
 
-    return tour_name
+    if tour_name is None:
+        raise TypeError(f"Could not extract tour name in gpx file under path: {path}")
+
+    return str(tour_name)
 
 
-def create_dataframe_from_gpx_data(gpx_data: List[GPXTrackPoint]) -> DataFrame:
-    # df = pd.DataFrame(columns=['lon', 'lat', 'alt', 'time'])
+
+def create_dataframe_from_gpx_data(gpx_data: List[gpxpy.gpx.GPXTrackPoint]) -> pd.DataFrame:
+    """
+    Convert gpx data to pandas DataFrame
+    :param gpx_data: GPXTrackPoint class containing elements of gps coordinate information
+    :return: DataFrame with longitude, latitude, altitude and timestamp columns from gpx data
+    """
 
     tmp = []
     for point in gpx_data:
-        df_tmp = pd.DataFrame({'lon': [point.longitude],
-                               'lat': [point.latitude],
-                               'alt': [point.elevation],
-                               'time': [point.time.replace(tzinfo=None, microsecond=0)]})
+        df_tmp = pd.DataFrame(
+            {'lon': [point.longitude],
+             'lat': [point.latitude],
+             'alt': [point.elevation],
+             'time': [point.time.replace(tzinfo=None, microsecond=0)]})  # type: ignore
         tmp.append(df_tmp)
 
     df_concat = pd.concat(tmp).reset_index(drop=True)
     df_concat['data_row'] = df_concat.index
+
     return df_concat
 
 
-def compute_tour_distances(df: DataFrame, gpx_data: List[GPXTrackPoint]) -> DataFrame:
+def compute_tour_distances(df: pd.DataFrame, gpx_data: List[gpxpy.gpx.GPXTrackPoint]) \
+        -> pd.DataFrame:
+    """
+    Compute distances from gps coordinates for time series gps tour data. Also calculate
+    altitude gain and loss.
+    :param df: DataFrame with time series tour data
+    :param gpx_data: GPXTrackPoint class containing elements of gps coordinate information
+    :return: DataFrame with tour data and with dinstances, altitude and time differences per each
+    coordinate
+    """
     alt_dif = [0]
     time_dif = [0]
     dist_vin_no_alt = [0]
     dist_dif_vin_2d = [0]
 
-    for index in range(len(gpx_data)):
+    for index in len(range(gpx_data)): # type: ignore
         if index == 0:
             pass
         else:
@@ -76,20 +112,22 @@ def compute_tour_distances(df: DataFrame, gpx_data: List[GPXTrackPoint]) -> Data
 
             stop = gpx_data[index]
 
-            distance_vin_2d = distance.geodesic((start.latitude, start.longitude),
-                                                (stop.latitude, stop.longitude)).m
+            distance_vin_2d = geopy.distance.geodesic(
+                (start.latitude, start.longitude),
+                (stop.latitude, stop.longitude)
+            ).m
 
             dist_dif_vin_2d.append(distance_vin_2d)
 
             dist_vin_no_alt.append(dist_vin_no_alt[-1] + distance_vin_2d)
 
-            alt_d = start.elevation - stop.elevation
+            alt_d = start.elevation - stop.elevation  # type: ignore
 
-            alt_dif.append(alt_d)
+            alt_dif.append(alt_d)  # type: ignore
 
-            time_delta = (stop.time - start.time).total_seconds()
+            time_delta = (stop.time - start.time).total_seconds()  # type: ignore
 
-            time_dif.append(time_delta)
+            time_dif.append(time_delta)  # type: ignore
 
     # add data to dataframe
     df['dis_vin_2d'] = dist_vin_no_alt
@@ -105,24 +143,34 @@ def compute_tour_distances(df: DataFrame, gpx_data: List[GPXTrackPoint]) -> Data
     return df
 
 
-def calculate_speed(df: DataFrame) -> DataFrame:
-    # super important step to match speed distribution of app. Implement in speed function
-    # df_drop_small_time_diffs = df[df['time_dif'] > 2].copy()
-    df_drop_small_time_diffs = df
-    df_drop_small_time_diffs.loc[:, 'spd'] = (df_drop_small_time_diffs['dis_dif_vin_2d'] /
-                                              df_drop_small_time_diffs['time_dif']) * 3.6
-    return df_drop_small_time_diffs
+def calculate_speed(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute speed per data point
+    :param df: DataFrame with tour data
+    :return: DataFrame with spd column in km/h
+    """
+
+    df.loc[:, 'spd'] = (df['dis_dif_vin_2d'] / df['time_dif']) * 3.6
+
+    return df
 
 
-def add_hash_id_to_dataframe(df: DataFrame, path: str) -> DataFrame:
+def add_hash_id_to_dataframe(df: pd.DataFrame, path: str) -> pd.DataFrame:
+    """
+    Add hash id metadata to DataFrame for unique identifier of gpx file
+    :param df: DataFrame with tour data
+    :param path: path to gpx file
+    :return: DataFrame with new column hash_id containing hash_id for all rows
+    """
     hash_code = create_md5_hash_code(path)
     df["hash_id"] = hash_code
     return df
 
 
-def add_tour_name_to_dataframe(df: DataFrame, path: str) -> DataFrame:
+def add_tour_name_to_dataframe(df: pd.DataFrame, path: str) -> pd.DataFrame:
     '''
-    Calls get_tour_name_from_gpx_data to get tour name from gpx data and adds it as col to DataFrame.
+    Calls get_tour_name_from_gpx_data to get tour name from gpx data and adds it as col to
+    DataFrame.
     :param df: DataFrame
     :param path: Path to gpx file
     :return: DataFrame with new col tour_name for entire tour partition
@@ -133,8 +181,16 @@ def add_tour_name_to_dataframe(df: DataFrame, path: str) -> DataFrame:
     return df
 
 
-def enrich_metadata(df: DataFrame, tour_name: str, user_name: str, time_of_receipt: datetime) \
-        -> DataFrame:
+def enrich_metadata(df: pd.DataFrame, tour_name: str, user_name: str, time_of_receipt: datetime) \
+        -> pd.DataFrame:
+    """
+    Enrich meta data for tour data
+    :param df: DataFrame with tour data
+    :param tour_name: Tour name extracted from gpx file
+    :param user_name: User name of tour owner
+    :param time_of_receipt: Time data was processed
+    :return: DataFrame enriched with metadata
+    """
     df['tour_name'] = tour_name
     df['user_name'] = user_name
     df['time_of_receipt'] = time_of_receipt
@@ -142,7 +198,15 @@ def enrich_metadata(df: DataFrame, tour_name: str, user_name: str, time_of_recei
     return df
 
 
-def prepare_gpx_data_for_database(path: str, user_name: str) -> DataFrame:
+def prepare_gpx_data_for_database(path: str, user_name: str) -> pd.DataFrame:
+    """
+    Pipeline function that combines all data processing steps in one wrapper function.
+    gpx data load, computation of distances, speed and metadata enrichment
+    :param path: Path to gpx file
+    :param user_name: User name as meta data
+    :return: DataFrame with computed tour data metrics and meta data suitable to write to database
+    """
+
     gpx_data = read_gpx_data(path)
 
     df = create_dataframe_from_gpx_data(gpx_data)

@@ -64,7 +64,7 @@ def truncate_to_date(df: pd.DataFrame, timestamp_col: str, date_col: str) -> pd.
     :return: DataFrame with truncated date
     """
     df[timestamp_col] = pd.to_datetime(df[timestamp_col])
-    df[date_col] = df[timestamp_col].dt.floor('d') # type: ignore
+    df[date_col] = df[timestamp_col].dt.floor('d')  # type: ignore
     return df
 
 # def create_df_statistics():
