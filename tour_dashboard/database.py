@@ -1,7 +1,7 @@
 """
 Functionalities to create connection urls, load and write data to mysql or sqlite databases
 """
-from typing import Dict
+from typing import Dict, Optional, cast
 import logging
 
 import sqlalchemy
@@ -14,18 +14,22 @@ from tour_dashboard import utils
 # pylint: disable=C0103
 
 
-def create_mysql_url(credentials: Dict[str, str]) -> str:
+def create_mysql_url(credentials: Optional[Dict[str, str]]) -> str:
     """
     Create mysql connection string for authentication to database
     :param credentials: credential keys are user, password, host, port, database, table
     :return: url connection string for mysql database
     """
+    if credentials is not None:
+        credentials_typed: dict = cast(dict, credentials)
+    else:
+        raise TypeError("Credentials are from type NoneType. Must be dict.")
 
-    user = credentials["user"]
-    password = credentials["password"]
-    host = credentials["host"]
-    port = credentials["port"]
-    database = credentials["database"]
+    user = credentials_typed["user"]
+    password = credentials_typed["password"]
+    host = credentials_typed["host"]
+    port = credentials_typed["port"]
+    database = credentials_typed["database"]
     dialect = "mysql"
     driver = "pymysql"
     url = f"{dialect}+{driver}://{user}:{password}@{host}:{port}/{database}"
@@ -45,6 +49,12 @@ def create_sqlite_url(database_path: str) -> str:
     return sqlite_database_path
 
 def execute_sql_query(engine: Engine, query) -> None:
+    """
+    Execute sql query
+    :param engine: Database engine to connect to database
+    :param query: Query to execute
+    :return: None
+    """
     with engine.connect() as con:
         con.execute(query)
 

@@ -55,9 +55,9 @@ def entry_exists_in_table_data(df_to_write: DataFrame, df_table: DataFrame) -> b
     result = any(item in df_to_write_ids for item in df_table_ids)
 
     if result:
-        logging.info(f"Tour: {tour_name} already exists in database.")
+        logging.info("Tour: %s already exists in database.", tour_name)
     else:
-        logging.info(f"Tour: {tour_name} is a new entry.")
+        logging.info("Tour: %s is a new entry.", tour_name)
 
     return result
 
