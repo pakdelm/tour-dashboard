@@ -20,6 +20,9 @@ def test_create_mysql_url():
     expected_url = "mysql+pymysql://your_user_name:your_password@127.0.0.1:3306/your_database_name"
     assert actual_url == expected_url
 
+def test_create_mysql_url_none():
+    with pytest.raises(TypeError):
+        database.create_mysql_url(credentials=None)
 
 def test_create_sqlite_url():
     _path = "path/to/database"
